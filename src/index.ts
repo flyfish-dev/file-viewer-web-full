@@ -81,7 +81,8 @@ function createFullAssetOptions(assetBaseUrl?: string | URL | null): ViewerOptio
       workerUrl: `${baseUrl}vendor/pdf/pdf.worker.mjs`,
       cMapUrl: `${baseUrl}vendor/pdf/cmaps/`,
       wasmUrl: `${baseUrl}vendor/pdf/wasm/`,
-      standardFontDataUrl: `${baseUrl}vendor/pdf/standard_fonts/`
+      standardFontDataUrl: `${baseUrl}vendor/pdf/standard_fonts/`,
+      cjkFontFallbackPath: `${baseUrl}vendor/pdf/fonts/`
     },
     presentation: {
       workerUrl: `${baseUrl}vendor/pptx/pptx.worker.js`
