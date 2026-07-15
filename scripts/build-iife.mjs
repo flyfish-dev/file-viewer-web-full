@@ -1,8 +1,9 @@
 import { existsSync } from 'node:fs'
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
+import { sanitizeOfflineViewerAssetTree } from './offline-asset-sanitize.mjs'
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const entry = join(packageDir, 'src', 'global.ts')
@@ -162,6 +163,20 @@ if (assetSource) {
   console.log(`[web-full-iife] Copied viewer assets from ${assetSource}`)
 } else {
   console.warn('[web-full-iife] Viewer assets were not copied. Run pnpm build:viewer-assets before publishing the full CDN package.')
+}
+
+const sanitization = await sanitizeOfflineViewerAssetTree(outDir)
+console.log(
+  `[web-full-iife] Sanitized ${sanitization.checkedFiles} shipped text assets; ` +
+  `replaced ${sanitization.replacementCount} public runtime fallback markers in ` +
+  `${sanitization.touchedFiles.length} files`
+)
+if (sanitization.touchedFiles.length) {
+  console.log(
+    `[web-full-iife] Localized public fallback markers in: ${sanitization.touchedFiles
+      .map(file => relative(packageDir, file).replaceAll('\\', '/'))
+      .join(', ')}`
+  )
 }
 
 console.log(`[web-full-iife] Built ${join(outDir, fileName)} and ${rendererBuilds.length} async renderer bundles`)
