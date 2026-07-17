@@ -140,7 +140,10 @@ await rm(generatedDir, { recursive: true, force: true })
 const assetSourceCandidates = [
   resolve(packageDir, '..', 'web', 'viewer'),
   resolve(packageDir, '..', '..', 'compat', 'web', 'viewer'),
-  resolve(packageDir, '..', '..', '..', 'apps', 'viewer-demo', 'dist')
+  resolve(packageDir, '..', '..', '..', 'apps', 'viewer-demo', 'dist'),
+  // A fresh public-source checkout has no generated viewer/demo dist yet. The
+  // tracked offline assets are the canonical bootstrap source for that build.
+  resolve(packageDir, '..', '..', '..', 'apps', 'viewer-demo', 'public')
 ]
 const assetSource = assetSourceCandidates.find(candidate =>
   existsSync(resolve(candidate, 'flyfish-viewer-assets.json')) ||
