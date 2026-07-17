@@ -151,6 +151,16 @@ const replacements = [
     reason: 'Google Fonts CSS endpoints are not available in offline deployments'
   },
   {
+    pattern: /https:\/\/packages\.typst\.org/g,
+    replacement: 'file-viewer-offline-typst-packages',
+    reason: 'Typst package registry fallbacks must not reach the public network'
+  },
+  {
+    pattern: /https:\/\/api\.github\.com/g,
+    replacement: 'file-viewer-offline-github-api',
+    reason: 'GitHub API fallbacks must not reach the public network'
+  },
+  {
     pattern: /https:\/\/cdn\.jsdelivr\.net/g,
     replacement: 'file-viewer-offline-cdn',
     reason: 'runtime CDN fallback markers are forbidden in release assets'

@@ -1,5 +1,6 @@
 import {
   DEFAULT_RENDERER_DEFINITIONS,
+  resolveFileViewerRuntimeAssetBaseUrl,
   type FileRenderHandler,
   type FileViewerRenderedInstance,
   type FileViewerRendererPlugin,
@@ -38,7 +39,7 @@ const lazyRendererLines = [
   { key: 'word', label: 'Word renderer', scriptName: 'word.iife.js', rendererIds: ['office-word-openxml', 'office-word-binary', 'open-document'] },
   { key: 'pdf', label: 'PDF renderer', scriptName: 'pdf.iife.js', rendererIds: ['pdf'] },
   { key: 'ofd', label: 'OFD renderer', scriptName: 'ofd.iife.js', rendererIds: ['ofd'] },
-  { key: 'presentation', label: 'Presentation renderer', scriptName: 'presentation.iife.js', rendererIds: ['office-presentation'] },
+  { key: 'presentation', label: 'Presentation renderer', scriptName: 'presentation.iife.js', rendererIds: ['office-presentation-binary', 'office-presentation'] },
   { key: 'spreadsheet', label: 'Spreadsheet renderer', scriptName: 'spreadsheet.iife.js', rendererIds: ['spreadsheet-openxml'] },
   { key: 'cad', label: 'CAD renderer', scriptName: 'cad.iife.js', rendererIds: ['cad'] },
   { key: 'typst', label: 'Typst renderer', scriptName: 'typst.iife.js', rendererIds: ['typst'] },
@@ -77,8 +78,15 @@ for (const definition of DEFAULT_RENDERER_DEFINITIONS) {
 }
 
 const DEFAULT_FULL_ASSET_BASE_URL = '/file-viewer/'
-const initialFullAssetBaseUrl = detectCurrentScriptBaseUrl() || DEFAULT_FULL_ASSET_BASE_URL
+const webFullScriptPattern = /(?:@file-viewer\/web-full|flyfish-file-viewer-web-full)/
+const initialFullScriptUrl = detectCurrentScriptUrl()
+const initialFullRendererBaseUrl = resolveScriptBaseUrl(initialFullScriptUrl) || DEFAULT_FULL_ASSET_BASE_URL
+const initialFullAssetBaseUrl = detectInitialFullAssetBaseUrl(
+  initialFullScriptUrl,
+  initialFullRendererBaseUrl
+)
 let defaultFullAssetBaseUrl: string | undefined = initialFullAssetBaseUrl
+let defaultFullRendererBaseUrl: string | undefined = initialFullRendererBaseUrl
 
 function normalizeAssetBaseUrl(baseUrl?: string | URL | null) {
   if (!baseUrl) {
@@ -91,7 +99,7 @@ function normalizeAssetBaseUrl(baseUrl?: string | URL | null) {
   return value.endsWith('/') ? value : `${value}/`
 }
 
-function detectCurrentScriptBaseUrl() {
+function detectCurrentScriptUrl() {
   if (typeof document === 'undefined') {
     return undefined
   }
@@ -100,16 +108,30 @@ function detectCurrentScriptBaseUrl() {
   const script = currentScript?.src
     ? currentScript
     : scripts.reverse().find(item =>
-        /(?:@file-viewer\/web-full|flyfish-file-viewer-web-full)/.test(item.src)
+        webFullScriptPattern.test(item.src)
       )
-  if (!script?.src) {
+  return script?.src || undefined
+}
+
+function resolveScriptBaseUrl(scriptUrl?: string) {
+  if (!scriptUrl) {
     return undefined
   }
   try {
-    return new URL('./', script.src).href
+    return new URL('./', scriptUrl).href
   } catch {
     return undefined
   }
+}
+
+function detectInitialFullAssetBaseUrl(
+  scriptUrl: string | undefined,
+  rendererBaseUrl: string
+) {
+  if (typeof document === 'undefined' || !scriptUrl || webFullScriptPattern.test(scriptUrl)) {
+    return rendererBaseUrl
+  }
+  return normalizeAssetBaseUrl(resolveFileViewerRuntimeAssetBaseUrl(document)) || rendererBaseUrl
 }
 
 function createFullAssetOptions(assetBaseUrl?: string | URL | null): ViewerOptions {
@@ -137,6 +159,11 @@ function createFullAssetOptions(assetBaseUrl?: string | URL | null): ViewerOptio
     drawing: {
       viewerScriptUrl: `${baseUrl}vendor/drawio/viewer-static.min.js`
     },
+    model: {
+      workerUrl: `${baseUrl}wasm/model/occt-worker.js`,
+      runtimeUrl: `${baseUrl}wasm/model/occt-import-js.js`,
+      wasmUrl: `${baseUrl}wasm/model/occt-import-js.wasm`
+    },
     pdf: {
       workerUrl: `${baseUrl}vendor/pdf/pdf.worker.mjs`,
       cMapUrl: `${baseUrl}vendor/pdf/cmaps/`,
@@ -145,6 +172,10 @@ function createFullAssetOptions(assetBaseUrl?: string | URL | null): ViewerOptio
       cjkFontFallbackPath: `${baseUrl}vendor/pdf/fonts/`
     },
     presentation: {
+      pptModuleUrl: `${baseUrl}vendor/ppt/index.mjs`,
+      pptWorkerUrl: `${baseUrl}vendor/ppt/worker.mjs`,
+      pptWasmUrl: `${baseUrl}vendor/ppt/ppt-native.wasm`,
+      pptFontUrl: `${baseUrl}vendor/ppt/ppt-font-cjk.otf`,
       workerUrl: `${baseUrl}vendor/pptx/pptx.worker.js`
     },
     spreadsheet: {
@@ -168,9 +199,12 @@ function mergeNestedOptions<Options extends object>(
   if (!overrides) {
     return defaults
   }
+  const definedOverrides = Object.fromEntries(
+    Object.entries(overrides).filter(([, value]) => value !== undefined)
+  ) as Partial<Options>
   return {
     ...defaults,
-    ...overrides
+    ...definedOverrides
   } as Options
 }
 
@@ -196,16 +230,19 @@ export function getDefaultFullAssetBaseUrl() {
 }
 
 export function setDefaultFullAssetBaseUrl(assetBaseUrl?: string | URL | null) {
-  defaultFullAssetBaseUrl = normalizeAssetBaseUrl(assetBaseUrl)
+  const normalizedBaseUrl = normalizeAssetBaseUrl(assetBaseUrl)
+  defaultFullAssetBaseUrl = normalizedBaseUrl
+  defaultFullRendererBaseUrl = normalizedBaseUrl
 }
 
 export function resetDefaultFullAssetBaseUrl() {
   defaultFullAssetBaseUrl = initialFullAssetBaseUrl
+  defaultFullRendererBaseUrl = initialFullRendererBaseUrl
 }
 
 export function getFullRendererScriptUrl(
   rendererOrExtension: string,
-  assetBaseUrl: string | URL | null | undefined = defaultFullAssetBaseUrl
+  assetBaseUrl: string | URL | null | undefined = defaultFullRendererBaseUrl
 ) {
   const line = resolveFullRendererLine(rendererOrExtension)
   if (!line) {
@@ -340,7 +377,8 @@ export function withFullViewerOptions(
     pdf: mergeNestedOptions(pdfDefaults, rest.pdf),
     presentation: mergeNestedOptions(assetOptions.presentation, rest.presentation),
     spreadsheet: mergeNestedOptions(assetOptions.spreadsheet, rest.spreadsheet),
-    typst: mergeNestedOptions(assetOptions.typst, rest.typst)
+    typst: mergeNestedOptions(assetOptions.typst, rest.typst),
+    model: mergeNestedOptions(assetOptions.model, rest.model)
   }
 }
 

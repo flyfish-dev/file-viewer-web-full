@@ -4,10 +4,12 @@ import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
 import { sanitizeOfflineViewerAssetTree } from './offline-asset-sanitize.mjs'
+import { verifyPptRuntimeDistributionRoot } from './ppt-runtime-integrity.mjs'
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const entry = join(packageDir, 'src', 'global.ts')
 const excalidrawStub = resolve(packageDir, '..', 'web', 'scripts', 'excalidraw-iife-stub.ts')
+const pptPackagedRuntimeFallback = resolve(packageDir, 'scripts', 'ppt-packaged-runtime-fallback.ts')
 const outDir = join(packageDir, 'dist')
 const fileName = 'flyfish-file-viewer-web-full.iife.js'
 const rendererOutDir = join(outDir, 'renderers')
@@ -106,7 +108,8 @@ bucket[renderer.id] = renderer
     },
     resolve: {
       alias: {
-        '@excalidraw/excalidraw': excalidrawStub
+        '@excalidraw/excalidraw': excalidrawStub,
+        '@file-viewer/ppt': pptPackagedRuntimeFallback
       },
       dedupe: ['@file-viewer/core']
     },
@@ -166,6 +169,9 @@ if (assetSource) {
 }
 
 const sanitization = await sanitizeOfflineViewerAssetTree(outDir)
+await verifyPptRuntimeDistributionRoot(outDir, {
+  unbundledJavaScriptPath: 'renderers/presentation.iife.js'
+})
 console.log(
   `[web-full-iife] Sanitized ${sanitization.checkedFiles} shipped text assets; ` +
   `replaced ${sanitization.replacementCount} public runtime fallback markers in ` +
