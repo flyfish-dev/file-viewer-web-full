@@ -1,5 +1,8 @@
 import {
+  DEFAULT_FILE_VIEWER_CAD_RUNTIME_VERSION,
+  DEFAULT_FILE_VIEWER_DOCX_RUNTIME_VERSION,
   DEFAULT_RENDERER_DEFINITIONS,
+  DEFAULT_FILE_VIEWER_PPT_RUNTIME_VERSION,
   resolveFileViewerRuntimeAssetBaseUrl,
   type FileRenderHandler,
   type FileViewerRenderedInstance,
@@ -139,22 +142,31 @@ function createFullAssetOptions(assetBaseUrl?: string | URL | null): ViewerOptio
   if (!baseUrl) {
     return {}
   }
+  const pptAssetUrl = (path: string) => (
+    `${baseUrl}${path}?file-viewer-ppt=${encodeURIComponent(DEFAULT_FILE_VIEWER_PPT_RUNTIME_VERSION)}`
+  )
+  const docxAssetUrl = (path: string) => (
+    `${baseUrl}${path}?file-viewer-docx=${encodeURIComponent(DEFAULT_FILE_VIEWER_DOCX_RUNTIME_VERSION)}`
+  )
+  const cadAssetUrl = (path: string) => (
+    `${baseUrl}${path}?file-viewer-cad=${encodeURIComponent(DEFAULT_FILE_VIEWER_CAD_RUNTIME_VERSION)}`
+  )
   return {
     archive: {
       workerUrl: `${baseUrl}vendor/libarchive/worker-bundle.js`,
       wasmUrl: `${baseUrl}vendor/libarchive/libarchive.wasm`
     },
     cad: {
-      wasmPath: `${baseUrl}wasm/cad/`,
-      workerUrl: `${baseUrl}wasm/cad/dwg-worker.js`,
-      dwfWasmUrl: `${baseUrl}wasm/cad/dwfv-render.wasm`
+      wasmPath: `${baseUrl}wasm/cad/${DEFAULT_FILE_VIEWER_CAD_RUNTIME_VERSION}/`,
+      workerUrl: cadAssetUrl(`wasm/cad/${DEFAULT_FILE_VIEWER_CAD_RUNTIME_VERSION}/dwg-worker.js`),
+      dwfWasmUrl: cadAssetUrl(`wasm/cad/${DEFAULT_FILE_VIEWER_CAD_RUNTIME_VERSION}/dwfv-render.wasm`)
     },
     data: {
       sqlWasmUrl: `${baseUrl}wasm/data/sql-wasm.wasm`
     },
     docx: {
-      workerUrl: `${baseUrl}vendor/docx/docx.worker.js`,
-      workerJsZipUrl: `${baseUrl}vendor/docx/jszip.min.js`
+      workerUrl: docxAssetUrl('vendor/docx/docx.worker.js'),
+      workerJsZipUrl: docxAssetUrl('vendor/docx/jszip.min.js')
     },
     drawing: {
       viewerScriptUrl: `${baseUrl}vendor/drawio/viewer-static.min.js`
@@ -172,10 +184,10 @@ function createFullAssetOptions(assetBaseUrl?: string | URL | null): ViewerOptio
       cjkFontFallbackPath: `${baseUrl}vendor/pdf/fonts/`
     },
     presentation: {
-      pptModuleUrl: `${baseUrl}vendor/ppt/index.mjs`,
-      pptWorkerUrl: `${baseUrl}vendor/ppt/worker.mjs`,
-      pptWasmUrl: `${baseUrl}vendor/ppt/ppt-native.wasm`,
-      pptFontUrl: `${baseUrl}vendor/ppt/ppt-font-cjk.otf`,
+      pptModuleUrl: pptAssetUrl('vendor/ppt/index.mjs'),
+      pptWorkerUrl: pptAssetUrl('vendor/ppt/worker.mjs'),
+      pptWasmUrl: pptAssetUrl('vendor/ppt/ppt-native.wasm'),
+      pptFontUrl: pptAssetUrl('vendor/ppt/ppt-font-cjk.otf'),
       workerUrl: `${baseUrl}vendor/pptx/pptx.worker.js`
     },
     spreadsheet: {
