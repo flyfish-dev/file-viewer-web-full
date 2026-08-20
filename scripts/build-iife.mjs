@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { cp, mkdir, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
@@ -7,6 +7,7 @@ import { sanitizeOfflineViewerAssetTree } from './offline-asset-sanitize.mjs'
 import { verifyPptRuntimeDistributionRoot } from './ppt-runtime-integrity.mjs'
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const packageManifest = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8'))
 const entry = join(packageDir, 'src', 'global.ts')
 const excalidrawStub = resolve(packageDir, '..', 'web', 'scripts', 'excalidraw-iife-stub.ts')
 const pptPackagedRuntimeFallback = resolve(packageDir, 'scripts', 'ppt-packaged-runtime-fallback.ts')
@@ -21,6 +22,9 @@ const rendererBuilds = [
   { key: 'ofd', packageName: '@file-viewer/renderer-ofd', exportName: 'ofdRenderer', globalName: 'FlyfishFileViewerWebFullRendererOfd' },
   { key: 'presentation', packageName: '@file-viewer/renderer-presentation', exportName: 'presentationRenderer', globalName: 'FlyfishFileViewerWebFullRendererPresentation' },
   { key: 'spreadsheet', packageName: '@file-viewer/renderer-spreadsheet', exportName: 'spreadsheetRenderer', globalName: 'FlyfishFileViewerWebFullRendererSpreadsheet' },
+  { key: 'iwork', packageName: '@file-viewer/renderer-iwork', exportName: 'iworkRenderer', globalName: 'FlyfishFileViewerWebFullRendererIwork' },
+  { key: 'wordperfect', packageName: '@file-viewer/renderer-wordperfect', exportName: 'wordPerfectRenderer', globalName: 'FlyfishFileViewerWebFullRendererWordPerfect' },
+  { key: 'hangul', packageName: '@file-viewer/renderer-hangul', exportName: 'hangulRenderer', globalName: 'FlyfishFileViewerWebFullRendererHangul' },
   { key: 'cad', packageName: '@file-viewer/renderer-cad', exportName: 'cadRenderer', globalName: 'FlyfishFileViewerWebFullRendererCad' },
   { key: 'typst', packageName: '@file-viewer/renderer-typst', exportName: 'typstRenderer', globalName: 'FlyfishFileViewerWebFullRendererTypst' },
   { key: 'drawing', packageName: '@file-viewer/renderer-drawing', exportName: 'drawingRenderer', globalName: 'FlyfishFileViewerWebFullRendererDrawing' },
@@ -166,6 +170,16 @@ if (assetSource) {
     await rm(targetPath, { recursive: true, force: true })
     await cp(sourcePath, targetPath, { recursive: true })
   }
+  await writeFile(
+    resolve(outDir, 'flyfish-viewer-manifest.json'),
+    `${JSON.stringify({
+      name: packageManifest.name,
+      version: packageManifest.version,
+      kind: 'viewer-assets',
+      assets: 'flyfish-viewer-assets.json'
+    }, null, 2)}\n`,
+    'utf8'
+  )
   console.log(`[web-full-iife] Copied viewer assets from ${assetSource}`)
 } else {
   console.warn('[web-full-iife] Viewer assets were not copied. Run pnpm build:viewer-assets before publishing the full CDN package.')
