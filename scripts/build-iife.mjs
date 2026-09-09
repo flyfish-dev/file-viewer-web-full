@@ -5,11 +5,12 @@ import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
 import { sanitizeOfflineViewerAssetTree } from './offline-asset-sanitize.mjs'
 import { verifyPptRuntimeDistributionRoot } from './ppt-runtime-integrity.mjs'
+import { isolateAmd, writeAmdEntry } from './amd-entry.mjs'
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const packageManifest = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8'))
 const entry = join(packageDir, 'src', 'global.ts')
-const excalidrawStub = resolve(packageDir, '..', 'web', 'scripts', 'excalidraw-iife-stub.ts')
+const excalidrawStub = resolve(packageDir, 'scripts', 'excalidraw-iife-stub.ts')
 const pptPackagedRuntimeFallback = resolve(packageDir, 'scripts', 'ppt-packaged-runtime-fallback.ts')
 const prettierIifeStub = resolve(packageDir, 'scripts', 'prettier-iife-stub.ts')
 // The frozen full contract must not carry megabytes of Prettier parser code inside a
@@ -106,12 +107,15 @@ await build({
     },
     rollupOptions: {
       output: {
+        ...isolateAmd,
         exports: 'named',
         extend: true
       }
     }
   }
 })
+
+await writeAmdEntry(join(outDir, fileName), 'FlyfishFileViewerWebFull')
 
 await rm(generatedDir, { recursive: true, force: true })
 await mkdir(generatedDir, { recursive: true })
@@ -163,6 +167,7 @@ bucket[renderer.id] = renderer
       },
       rollupOptions: {
         output: {
+          ...isolateAmd,
           exports: 'none',
           extend: true
         }
@@ -173,14 +178,7 @@ bucket[renderer.id] = renderer
 
 await rm(generatedDir, { recursive: true, force: true })
 
-const assetSourceCandidates = [
-  resolve(packageDir, '..', 'web', 'viewer'),
-  resolve(packageDir, '..', '..', 'compat', 'web', 'viewer'),
-  resolve(packageDir, '..', '..', '..', 'apps', 'viewer-demo', 'dist'),
-  // A fresh public-source checkout has no generated viewer/demo dist yet. The
-  // tracked offline assets are the canonical bootstrap source for that build.
-  resolve(packageDir, '..', '..', '..', 'apps', 'viewer-demo', 'public')
-]
+const assetSourceCandidates = [resolve(packageDir, 'viewer')]
 const assetSource = assetSourceCandidates.find(candidate =>
   existsSync(resolve(candidate, 'flyfish-viewer-assets.json')) ||
   existsSync(resolve(candidate, 'vendor')) ||

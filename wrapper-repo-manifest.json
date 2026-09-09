@@ -1,19 +1,20 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-07T08:24:03.808Z",
+  "generatedAt": "2026-09-09T20:49:29.725Z",
   "sourceBranch": "main",
-  "sourceCommit": "38f54c8",
+  "sourceCommit": "a177a45",
   "organization": "flyfish-dev",
   "framework": "Vanilla JS / Pure Web Full",
   "packageName": "@file-viewer/web-full",
-  "packageVersion": "3.0.2",
+  "packageVersion": "3.0.3",
   "repository": "file-viewer-web-full",
   "github": "https://github.com/flyfish-dev/file-viewer-web-full",
   "gitee": "https://gitee.com/flyfish-dev/file-viewer-web-full",
   "entryFormats": [
     "esm",
     "types",
-    "iife"
+    "iife",
+    "amd"
   ],
   "historicalPackages": [],
   "sourcePackageDir": "packages/components/web-full",

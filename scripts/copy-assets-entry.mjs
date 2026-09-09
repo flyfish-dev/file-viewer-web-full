@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import {
   copyFileViewerAssets,
   parseCopyAssetsCliArguments
-} from '../../../tools/copy-assets/src/index.ts'
+} from './copy-assets-core.ts'
 
 const packageDir = fileURLToPath(new URL('..', import.meta.url))
 const packageJson = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8'))
