@@ -1,0 +1,108 @@
+{
+  "name": "@file-viewer/web-full",
+  "version": "3.3.1",
+  "private": false,
+  "type": "module",
+  "description": "Browser-native file preview for Vanilla JS / Pure Web with the Full renderer preset and self-hosted runtime assets.",
+  "keywords": [
+    "file-viewer",
+    "document-preview",
+    "vanilla-js",
+    "web-component",
+    "full-preset",
+    "office-preview",
+    "cad-viewer",
+    "document-viewer",
+    "file-preview",
+    "self-hosted"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "author": {
+    "name": "Yu Wang",
+    "email": "admin@flyfish.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flyfish-dev/file-viewer.git",
+    "directory": "packages/components/web-full"
+  },
+  "homepage": "https://github.com/flyfish-dev/file-viewer#readme",
+  "bugs": {
+    "url": "https://github.com/flyfish-dev/file-viewer/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://dev.flyfish.group/donate?source=npm"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "file-viewer-copy-assets": "./scripts/copy-assets.mjs"
+  },
+  "unpkg": "./dist/flyfish-file-viewer-web-full.iife.js",
+  "jsdelivr": "./dist/flyfish-file-viewer-web-full.iife.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./amd": "./dist/flyfish-file-viewer-web-full.amd.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "scripts/copy-assets.mjs",
+    "README.md",
+    "README.en.md",
+    "README.zh-CN.md"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json && node scripts/build-iife.mjs && node scripts/build-copy-assets.mjs",
+    "type-check": "tsc -b tsconfig.json",
+    "verify:packed-assets": "node scripts/verify-packed-assets.mjs",
+    "verify:github-258": "npm exec --yes --package playwright@1.61.1 --package requirejs@2.3.7 -- node scripts/verify-github-258.mjs"
+  },
+  "dependencies": {
+    "@file-viewer/assets-cad": "3.3.1",
+    "@file-viewer/assets-drawing": "3.3.1",
+    "@file-viewer/core": "3.3.1",
+    "@file-viewer/preset-all": "3.3.1",
+    "@file-viewer/renderer-3d": "3.3.1",
+    "@file-viewer/renderer-archive": "3.3.1",
+    "@file-viewer/renderer-cad": "3.3.1",
+    "@file-viewer/renderer-data": "3.3.1",
+    "@file-viewer/renderer-drawing": "3.3.1",
+    "@file-viewer/renderer-epub": "3.3.1",
+    "@file-viewer/renderer-eda": "3.3.1",
+    "@file-viewer/renderer-email": "3.3.1",
+    "@file-viewer/renderer-geo": "3.3.1",
+    "@file-viewer/renderer-image": "3.3.1",
+    "@file-viewer/renderer-media": "3.3.1",
+    "@file-viewer/renderer-mindmap": "3.3.1",
+    "@file-viewer/renderer-ofd": "3.3.1",
+    "@file-viewer/renderer-pdf": "3.3.1",
+    "@file-viewer/renderer-presentation": "3.3.1",
+    "@file-viewer/renderer-spreadsheet": "3.3.1",
+    "@file-viewer/renderer-text": "3.3.1",
+    "@file-viewer/renderer-typst": "3.3.1",
+    "@file-viewer/renderer-word": "3.3.1",
+    "@file-viewer/web": "3.3.1",
+    "@file-viewer/renderer-hangul": "3.3.1",
+    "@file-viewer/renderer-iwork": "3.3.1",
+    "@file-viewer/renderer-wordperfect": "3.3.1"
+  },
+  "devDependencies": {
+    "@file-viewer/capability-pdf-identity-repair": "3.3.1",
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^6.0.3",
+    "vite": "8.3.5",
+    "@file-viewer/ppt": "0.3.6"
+  },
+  "license": "Apache-2.0"
+}

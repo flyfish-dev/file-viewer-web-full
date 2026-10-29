@@ -1,0 +1,513 @@
+{
+  "name": "@file-viewer/web-full",
+  "version": "3.3.1",
+  "private": false,
+  "type": "module",
+  "description": "Browser-native file preview for Vanilla JS / Pure Web with the Full renderer preset and self-hosted runtime assets.",
+  "keywords": [
+    "file-viewer",
+    "document-preview",
+    "vanilla-js",
+    "web-component",
+    "full-preset",
+    "office-preview",
+    "cad-viewer",
+    "document-viewer",
+    "file-preview",
+    "self-hosted"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "author": {
+    "name": "Yu Wang",
+    "email": "admin@flyfish.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flyfish-dev/file-viewer-web-full.git"
+  },
+  "homepage": "https://github.com/flyfish-dev/file-viewer-web-full",
+  "bugs": {
+    "url": "https://github.com/flyfish-dev/file-viewer-web-full/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://dev.flyfish.group/donate?source=npm"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "file-viewer-copy-assets": "./scripts/copy-assets.mjs"
+  },
+  "unpkg": "./dist/flyfish-file-viewer-web-full.iife.js",
+  "jsdelivr": "./dist/flyfish-file-viewer-web-full.iife.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./amd": "./dist/flyfish-file-viewer-web-full.amd.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "scripts/copy-assets.mjs",
+    "README.md",
+    "README.en.md",
+    "README.zh-CN.md"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json && node scripts/build-iife.mjs && node scripts/build-copy-assets.mjs",
+    "type-check": "tsc -b tsconfig.json",
+    "verify:github-258": "npm exec --yes --package playwright@1.61.1 --package requirejs@2.3.7 -- node scripts/verify-github-258.mjs"
+  },
+  "dependencies": {
+    "@file-viewer/assets-cad": "3.3.1",
+    "@file-viewer/assets-drawing": "3.3.1",
+    "@file-viewer/core": "3.3.1",
+    "@file-viewer/preset-all": "3.3.1",
+    "@file-viewer/renderer-3d": "3.3.1",
+    "@file-viewer/renderer-archive": "3.3.1",
+    "@file-viewer/renderer-cad": "3.3.1",
+    "@file-viewer/renderer-data": "3.3.1",
+    "@file-viewer/renderer-drawing": "3.3.1",
+    "@file-viewer/renderer-epub": "3.3.1",
+    "@file-viewer/renderer-eda": "3.3.1",
+    "@file-viewer/renderer-email": "3.3.1",
+    "@file-viewer/renderer-geo": "3.3.1",
+    "@file-viewer/renderer-image": "3.3.1",
+    "@file-viewer/renderer-media": "3.3.1",
+    "@file-viewer/renderer-mindmap": "3.3.1",
+    "@file-viewer/renderer-ofd": "3.3.1",
+    "@file-viewer/renderer-pdf": "3.3.1",
+    "@file-viewer/renderer-presentation": "3.3.1",
+    "@file-viewer/renderer-spreadsheet": "3.3.1",
+    "@file-viewer/renderer-text": "3.3.1",
+    "@file-viewer/renderer-typst": "3.3.1",
+    "@file-viewer/renderer-word": "3.3.1",
+    "@file-viewer/web": "3.3.1",
+    "@file-viewer/renderer-hangul": "3.3.1",
+    "@file-viewer/renderer-iwork": "3.3.1",
+    "@file-viewer/renderer-wordperfect": "3.3.1"
+  },
+  "devDependencies": {
+    "@file-viewer/renderer-design": "3.3.1",
+    "@file-viewer/capability-pdf-identity-repair": "3.3.1",
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^6.0.3",
+    "vite": "8.3.5",
+    "@file-viewer/ppt": "0.3.6",
+    "pdfjs-dist": "5.4.624",
+    "jszip": "3.10.2"
+  },
+  "license": "Apache-2.0",
+  "overrides": {
+    "@file-viewer/docx": "0.3.39",
+    "@flyfish-dev/cad-viewer": "0.8.3",
+    "@kenjiuno/msgreader": "1.29.0",
+    "@myriaddreamin/typst-ts-renderer": "0.7.0",
+    "@myriaddreamin/typst-ts-web-compiler": "0.7.0",
+    "@myriaddreamin/typst.ts": "0.7.0",
+    "@panzoom/panzoom": "4.6.2",
+    "@tmcw/togeojson": "7.1.3",
+    "@xmldom/xmldom": "0.9.12",
+    "ag-psd": "31.0.3",
+    "base64-js": "1.5.1",
+    "buffer": "6.0.3",
+    "but-unzip": "0.1.10",
+    "cfb": "1.2.2",
+    "dompurify": "3.4.17",
+    "dwf-viewer": "0.6.7",
+    "dxf-parser": "1.1.2",
+    "e-virt-table": "1.4.16",
+    "heic2any": "0.0.4",
+    "highlight.js": "11.12.0",
+    "hyparquet": "1.31.5",
+    "iconv-lite": "0.6.3",
+    "ieee754": "1.2.1",
+    "jszip": "3.10.2",
+    "libarchive.js": "2.0.2",
+    "loglevel": "1.9.2",
+    "maplibre-gl": {
+      ".": "6.16.0",
+      "@mapbox/tiny-sdf": "2.3.0"
+    },
+    "marked": "18.1.2",
+    "mgrs": "1.0.0",
+    "pako@1.0.11": "1.0.11",
+    "pako@2.2.0": "2.2.0",
+    "parsedbf": "2.0.0",
+    "plantuml-encoder": "1.4.0",
+    "postal-mime": "4.1.4",
+    "proj4@2.20.9": "2.20.9",
+    "proj4@2.22.0": "2.22.0",
+    "roughjs": "4.6.6",
+    "safe-buffer": "5.2.1",
+    "safer-buffer": "2.1.2",
+    "shpjs": {
+      ".": "6.2.0",
+      "proj4": "2.20.9"
+    },
+    "sql.js": "1.14.1",
+    "string_decoder": "1.3.0",
+    "styled-exceljs": "0.21.6",
+    "three": "0.186.0",
+    "tinycolor2": "1.6.0",
+    "utif": "3.1.0",
+    "wkt-parser": "1.5.5"
+  },
+  "fileViewerPrivateBuildInputs": [
+    {
+      "name": "@file-viewer/capability-mermaid",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/capability-pdf-identity-repair",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/core",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/doc",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/docx",
+      "version": "0.3.39"
+    },
+    {
+      "name": "@file-viewer/eda-layout",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/eda-orcad",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/geometry-engine",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/pptx",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-3d",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-archive",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-cad",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-data",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-drawing",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-eda",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-email",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-epub",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-geo",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-hangul",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-image",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-iwork",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-media",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-mindmap",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-ofd",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-pdf",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-ppt",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-pptx",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-presentation",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-spreadsheet",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-text",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-typst",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-word",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/renderer-wordperfect",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/web",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@file-viewer/web-full",
+      "version": "3.3.1"
+    },
+    {
+      "name": "@flyfish-dev/cad-viewer",
+      "version": "0.8.3"
+    },
+    {
+      "name": "@kenjiuno/msgreader",
+      "version": "1.29.0"
+    },
+    {
+      "name": "@myriaddreamin/typst-ts-renderer",
+      "version": "0.7.0"
+    },
+    {
+      "name": "@myriaddreamin/typst-ts-web-compiler",
+      "version": "0.7.0"
+    },
+    {
+      "name": "@myriaddreamin/typst.ts",
+      "version": "0.7.0"
+    },
+    {
+      "name": "@panzoom/panzoom",
+      "version": "4.6.2"
+    },
+    {
+      "name": "@tmcw/togeojson",
+      "version": "7.1.3"
+    },
+    {
+      "name": "@xmldom/xmldom",
+      "version": "0.9.12"
+    },
+    {
+      "name": "ag-psd",
+      "version": "31.0.3"
+    },
+    {
+      "name": "base64-js",
+      "version": "1.5.1"
+    },
+    {
+      "name": "buffer",
+      "version": "6.0.3"
+    },
+    {
+      "name": "but-unzip",
+      "version": "0.1.10"
+    },
+    {
+      "name": "cfb",
+      "version": "1.2.2"
+    },
+    {
+      "name": "dompurify",
+      "version": "3.4.17"
+    },
+    {
+      "name": "dwf-viewer",
+      "version": "0.6.7"
+    },
+    {
+      "name": "dxf-parser",
+      "version": "1.1.2"
+    },
+    {
+      "name": "e-virt-table",
+      "version": "1.4.16"
+    },
+    {
+      "name": "heic2any",
+      "version": "0.0.4"
+    },
+    {
+      "name": "highlight.js",
+      "version": "11.12.0"
+    },
+    {
+      "name": "hyparquet",
+      "version": "1.31.5"
+    },
+    {
+      "name": "iconv-lite",
+      "version": "0.6.3"
+    },
+    {
+      "name": "ieee754",
+      "version": "1.2.1"
+    },
+    {
+      "name": "jszip",
+      "version": "3.10.2"
+    },
+    {
+      "name": "libarchive.js",
+      "version": "2.0.2"
+    },
+    {
+      "name": "loglevel",
+      "version": "1.9.2"
+    },
+    {
+      "name": "maplibre-gl",
+      "version": "6.16.0"
+    },
+    {
+      "name": "marked",
+      "version": "18.1.2"
+    },
+    {
+      "name": "mgrs",
+      "version": "1.0.0"
+    },
+    {
+      "name": "pako",
+      "version": "1.0.11"
+    },
+    {
+      "name": "pako",
+      "version": "2.2.0"
+    },
+    {
+      "name": "parsedbf",
+      "version": "2.0.0"
+    },
+    {
+      "name": "plantuml-encoder",
+      "version": "1.4.0"
+    },
+    {
+      "name": "postal-mime",
+      "version": "4.1.4"
+    },
+    {
+      "name": "proj4",
+      "version": "2.20.9"
+    },
+    {
+      "name": "proj4",
+      "version": "2.22.0"
+    },
+    {
+      "name": "roughjs",
+      "version": "4.6.6"
+    },
+    {
+      "name": "safe-buffer",
+      "version": "5.2.1"
+    },
+    {
+      "name": "safer-buffer",
+      "version": "2.1.2"
+    },
+    {
+      "name": "shpjs",
+      "version": "6.2.0"
+    },
+    {
+      "name": "sql.js",
+      "version": "1.14.1"
+    },
+    {
+      "name": "string_decoder",
+      "version": "1.3.0"
+    },
+    {
+      "name": "styled-exceljs",
+      "version": "0.21.6"
+    },
+    {
+      "name": "three",
+      "version": "0.186.0"
+    },
+    {
+      "name": "tinycolor2",
+      "version": "1.6.0"
+    },
+    {
+      "name": "utif",
+      "version": "3.1.0"
+    },
+    {
+      "name": "wkt-parser",
+      "version": "1.5.5"
+    }
+  ],
+  "fileViewerPrivateBuildScopes": [
+    {
+      "parent": "shpjs",
+      "parentVersion": "6.2.0",
+      "dependency": "proj4",
+      "version": "2.20.9",
+      "chain": [
+        "@file-viewer/renderer-geo",
+        "shpjs"
+      ]
+    },
+    {
+      "parent": "maplibre-gl",
+      "parentVersion": "6.16.0",
+      "dependency": "@mapbox/tiny-sdf",
+      "version": "2.3.0",
+      "chain": [
+        "@file-viewer/renderer-geo",
+        "maplibre-gl"
+      ]
+    }
+  ],
+  "packageManager": "pnpm@11.0.9"
+}

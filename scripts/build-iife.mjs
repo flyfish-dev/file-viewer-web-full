@@ -1,0 +1,227 @@
+import { existsSync } from 'node:fs'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { build } from 'vite'
+import { stageFullViewerAssets } from "./build-support/stage-full-assets.mjs"
+import { isolateAmd, writeAmdEntry } from "./build-support/amd-entry.mjs"
+import * as webNode from '@file-viewer/web/node'
+import { writeBundleNotices } from "./build-support/bundle-notices.mjs"
+import { fullWorkspaceLicensePackages } from "./build-support/full-workspace-notices.mjs"
+import { appendCadIntegrationSourceNotice } from "./build-support/cad-source-offer.mjs"
+import { writeBundleInventory } from "./build-support/bundle-inventory.mjs"
+
+const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const packageManifest = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8'))
+const entry = join(packageDir, 'src', 'global.ts')
+const excalidrawStub = resolve(packageDir, '..', 'web', 'scripts', 'excalidraw-iife-stub.ts')
+const pptPackagedRuntimeFallback = resolve(packageDir, 'scripts', 'ppt-packaged-runtime-fallback.ts')
+const prettierIifeStub = resolve(packageDir, 'scripts', 'prettier-iife-stub.ts')
+// The frozen full contract must not carry megabytes of Prettier parser code inside a
+// script-tag bundle, and Prettier's ESM build uses `import.meta.resolve`, which the
+// published-package bundler-compatibility gate rejects. Aliasing every Prettier entry
+// point keeps the lazy chunk out of the shipped IIFE, so `text.prettyPrint` fails closed
+// and previews the original source exactly like an unsupported or oversized file.
+const prettierIifeAliases = Object.fromEntries(
+  [
+    'prettier/standalone',
+    'prettier/plugins/babel',
+    'prettier/plugins/estree',
+    'prettier/plugins/typescript',
+    'prettier/plugins/postcss',
+    'prettier/plugins/html',
+    'prettier/plugins/markdown',
+    'prettier/plugins/yaml',
+    'prettier/plugins/graphql',
+    '@prettier/plugin-xml'
+  ].map((specifier) => [specifier, prettierIifeStub])
+)
+const outDir = join(packageDir, 'dist')
+const previousAssetManifestPath = join(outDir, webNode.VIEWER_ASSET_MANIFEST_FILENAME)
+const previousAssetManifest = existsSync(previousAssetManifestPath)
+  ? JSON.parse(await readFile(previousAssetManifestPath, 'utf8')) : null
+const fileName = 'flyfish-file-viewer-web-full.iife.js'
+const rendererOutDir = join(outDir, 'renderers')
+const generatedDir = join(packageDir, '.generated-iife-renderers')
+const bundledInputs = new Set()
+const bundleInventoryPlugin = () => ({
+  name: 'file-viewer-full-bundle-input-inventory',
+  generateBundle(_options, bundle) {
+    for (const output of Object.values(bundle)) {
+      if (output.type !== 'chunk') continue
+      for (const id of Object.keys(output.modules)) {
+        if (isAbsolute(id) && !id.startsWith('\0')) bundledInputs.add(id.split('?')[0])
+      }
+    }
+  }
+})
+
+const rendererBuilds = [
+  { key: 'word', packageName: '@file-viewer/renderer-word', exportName: 'wordRenderer', globalName: 'FlyfishFileViewerWebFullRendererWord' },
+  {
+    key: 'pdf',
+    packageName: '@file-viewer/renderer-pdf',
+    exportName: 'pdfRenderer',
+    globalName: 'FlyfishFileViewerWebFullRendererPdf',
+    sideEffectImports: ['@file-viewer/capability-pdf-identity-repair']
+  },
+  { key: 'ofd', packageName: '@file-viewer/renderer-ofd', exportName: 'ofdRenderer', globalName: 'FlyfishFileViewerWebFullRendererOfd' },
+  { key: 'presentation', packageName: '@file-viewer/renderer-presentation', exportName: 'presentationRenderer', globalName: 'FlyfishFileViewerWebFullRendererPresentation' },
+  { key: 'spreadsheet', packageName: '@file-viewer/renderer-spreadsheet', exportName: 'spreadsheetRenderer', globalName: 'FlyfishFileViewerWebFullRendererSpreadsheet' },
+  { key: 'iwork', packageName: '@file-viewer/renderer-iwork', exportName: 'iworkRenderer', globalName: 'FlyfishFileViewerWebFullRendererIwork' },
+  { key: 'wordperfect', packageName: '@file-viewer/renderer-wordperfect', exportName: 'wordPerfectRenderer', globalName: 'FlyfishFileViewerWebFullRendererWordPerfect' },
+  { key: 'hangul', packageName: '@file-viewer/renderer-hangul', exportName: 'hangulRenderer', globalName: 'FlyfishFileViewerWebFullRendererHangul' },
+  { key: 'cad', packageName: '@file-viewer/renderer-cad', exportName: 'cadRenderer', globalName: 'FlyfishFileViewerWebFullRendererCad' },
+  { key: 'typst', packageName: '@file-viewer/renderer-typst', exportName: 'typstRenderer', globalName: 'FlyfishFileViewerWebFullRendererTypst' },
+  { key: 'drawing', packageName: '@file-viewer/renderer-drawing', exportName: 'drawingRenderer', globalName: 'FlyfishFileViewerWebFullRendererDrawing' },
+  { key: 'model', packageName: '@file-viewer/renderer-3d', exportName: 'modelRenderer', globalName: 'FlyfishFileViewerWebFullRendererModel' },
+  { key: 'archive', packageName: '@file-viewer/renderer-archive', exportName: 'archiveRenderer', globalName: 'FlyfishFileViewerWebFullRendererArchive' },
+  { key: 'email', packageName: '@file-viewer/renderer-email', exportName: 'emailRenderer', globalName: 'FlyfishFileViewerWebFullRendererEmail' },
+  { key: 'ebook', packageName: '@file-viewer/renderer-epub', exportName: 'ebookRenderer', globalName: 'FlyfishFileViewerWebFullRendererEbook' },
+  { key: 'text', packageName: '@file-viewer/renderer-text', exportName: 'textRenderer', globalName: 'FlyfishFileViewerWebFullRendererText' },
+  { key: 'image', packageName: '@file-viewer/renderer-image', exportName: 'imageRenderer', globalName: 'FlyfishFileViewerWebFullRendererImage' },
+  { key: 'media', packageName: '@file-viewer/renderer-media', exportName: 'mediaRenderer', globalName: 'FlyfishFileViewerWebFullRendererMedia' },
+  { key: 'mindmap', packageName: '@file-viewer/renderer-mindmap', exportName: 'mindmapRenderer', globalName: 'FlyfishFileViewerWebFullRendererMindmap' },
+  { key: 'geo', packageName: '@file-viewer/renderer-geo', exportName: 'geoRenderer', globalName: 'FlyfishFileViewerWebFullRendererGeo' },
+  { key: 'data', packageName: '@file-viewer/renderer-data', exportName: 'dataRenderer', globalName: 'FlyfishFileViewerWebFullRendererData' },
+  { key: 'eda', packageName: '@file-viewer/renderer-eda', exportName: 'edaRenderer', globalName: 'FlyfishFileViewerWebFullRendererEda' }
+]
+
+if (!existsSync(entry)) {
+  throw new Error(`Missing web full global entry: ${entry}`)
+}
+
+await mkdir(outDir, { recursive: true })
+await rm(rendererOutDir, { recursive: true, force: true })
+await mkdir(rendererOutDir, { recursive: true })
+
+await build({
+  base: './',
+  configFile: false,
+  publicDir: false,
+  logLevel: 'warn',
+  plugins: [bundleInventoryPlugin()],
+  worker: { plugins: () => [bundleInventoryPlugin()] },
+  define: {
+    '__FILE_VIEWER_WEB_FULL_VERSION__': JSON.stringify(packageManifest.version),
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    'process.env': JSON.stringify({ NODE_ENV: 'production' }),
+    'import.meta.url': 'document.currentScript?.src || location.href'
+  },
+  resolve: {
+    alias: {
+      // Keep the CDN full bundle usable without React peer dependencies.
+      '@excalidraw/excalidraw': excalidrawStub,
+      ...prettierIifeAliases
+    },
+    dedupe: ['@file-viewer/core']
+  },
+  build: {
+    emptyOutDir: false,
+    minify: 'esbuild',
+    sourcemap: false,
+    target: 'es2020',
+    lib: {
+      entry,
+      name: 'FlyfishFileViewerWebFull',
+      formats: ['iife'],
+      fileName: () => fileName
+    },
+    rollupOptions: {
+      output: {
+        ...isolateAmd,
+        exports: 'named',
+        extend: true
+      }
+    }
+  }
+})
+
+await writeAmdEntry(join(outDir, fileName), 'FlyfishFileViewerWebFull')
+
+await rm(generatedDir, { recursive: true, force: true })
+await mkdir(generatedDir, { recursive: true })
+
+for (const renderer of rendererBuilds) {
+  const rendererEntry = join(generatedDir, `${renderer.key}.ts`)
+  const sideEffectImports = (renderer.sideEffectImports || [])
+    .map(packageName => `import '${packageName}'`)
+    .join('\n')
+  await writeFile(rendererEntry, `
+${sideEffectImports}
+import { ${renderer.exportName} as renderer } from '${renderer.packageName}'
+
+const host = globalThis
+const bucket = host.FlyfishFileViewerWebFullRenderers || (host.FlyfishFileViewerWebFullRenderers = {})
+bucket['${renderer.key}'] = renderer
+bucket[renderer.id] = renderer
+`, 'utf8')
+
+  await build({
+    base: './',
+    configFile: false,
+    publicDir: false,
+    logLevel: 'warn',
+    plugins: [bundleInventoryPlugin()],
+    worker: { plugins: () => [bundleInventoryPlugin()] },
+    define: {
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      'process.env': JSON.stringify({ NODE_ENV: 'production' }),
+      'import.meta.url': 'document.currentScript?.src || location.href'
+    },
+    resolve: {
+      alias: {
+        '@excalidraw/excalidraw': excalidrawStub,
+        '@file-viewer/ppt': pptPackagedRuntimeFallback,
+        ...prettierIifeAliases
+      },
+      dedupe: ['@file-viewer/core']
+    },
+    build: {
+      emptyOutDir: false,
+      minify: 'esbuild',
+      outDir: rendererOutDir,
+      sourcemap: false,
+      target: 'es2020',
+      lib: {
+        entry: rendererEntry,
+        name: renderer.globalName,
+        formats: ['iife'],
+        fileName: () => `${renderer.key}.iife.js`
+      },
+      rollupOptions: {
+        output: {
+          ...isolateAmd,
+          exports: 'none',
+          extend: true
+        }
+      }
+    }
+  })
+}
+
+await writeBundleInventory([...bundledInputs], join(packageDir, '.build/iife-inputs.json'))
+await writeBundleNotices(
+  { inputs: Object.fromEntries([...bundledInputs].map(id => [id, {}])) },
+  join(outDir, 'THIRD_PARTY_LICENSES.txt'),
+  { readmeLicensePackages: ['@ljheee/xmind-parser'], includeWorkspacePackages: fullWorkspaceLicensePackages.map(owner => owner.packageName), includePrebundledSdkPackages: ['@file-viewer/capability-mermaid'] }
+)
+await appendCadIntegrationSourceNotice(join(outDir, 'THIRD_PARTY_LICENSES.txt'), packageManifest.version)
+
+await rm(generatedDir, { recursive: true, force: true })
+
+const { sanitization } = await stageFullViewerAssets({ packageDir, outDir, packageManifest, webNode, previousAssetManifest })
+console.log(
+  `[web-full-iife] Sanitized ${sanitization.checkedFiles} shipped text assets; ` +
+  `replaced ${sanitization.replacementCount} public runtime fallback markers in ` +
+  `${sanitization.touchedFiles.length} files`
+)
+if (sanitization.touchedFiles.length) {
+  console.log(
+    `[web-full-iife] Localized public fallback markers in: ${sanitization.touchedFiles
+      .map(file => relative(packageDir, file).replaceAll('\\', '/'))
+      .join(', ')}`
+  )
+}
+
+console.log(`[web-full-iife] Built ${join(outDir, fileName)} and ${rendererBuilds.length} async renderer bundles`)
