@@ -1,0 +1,152 @@
+[
+  {
+    "path": "vendor/design/THIRD_PARTY_NOTICES.md",
+    "bytes": 11451,
+    "sha256": "1b54aff0f85264a654649110a85c06433920739b8d55d14c211dd04803c0be7a"
+  },
+  {
+    "path": "vendor/design/LICENSE.illustrator-pgf-MIT.txt",
+    "bytes": 1083,
+    "sha256": "c1515c6efcdc70c0f1a0d0847d74c9e57d10ed82321fdd58a1bd85abd5df8c6a"
+  },
+  {
+    "path": "vendor/design/illustrator-pgf.worker.js",
+    "bytes": 125796,
+    "sha256": "4bad9c29b1cac43dfc58c00ab9c4e2fe2c52a128a05923d70a939b7a2f67077e"
+  },
+  {
+    "path": "vendor/design/LICENSE.fzstd-MIT.txt",
+    "bytes": 1069,
+    "sha256": "62249119bb7df6e54300f37a37145c26a6d4420410aac8881a119c5b427cf751"
+  },
+  {
+    "path": "vendor/design/LICENSE.ag-psd-MIT.txt",
+    "bytes": 1205,
+    "sha256": "035430250509b801de02201d2f9bc9388a1220198f9276d38f4059df882e585c"
+  },
+  {
+    "path": "vendor/design/LICENSE.base64-js-MIT.txt",
+    "bytes": 1081,
+    "sha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1"
+  },
+  {
+    "path": "vendor/design/LICENSE.pako-MIT.txt",
+    "bytes": 1104,
+    "sha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539"
+  },
+  {
+    "path": "vendor/design/LICENSE.webtoon-psd-MIT.txt",
+    "bytes": 1061,
+    "sha256": "61fbfce913e050fdefc12e64f658b4088916d73c8e9040e46feeca9cb34254f7"
+  },
+  {
+    "path": "vendor/design/photoshop.worker.js",
+    "bytes": 379020,
+    "sha256": "3a8b04ff7c2b4d1d398a434b5dff284c33147854f00f9b8b34611ccca1d55556"
+  },
+  {
+    "path": "vendor/design/adobe-resource.worker.js",
+    "bytes": 339757,
+    "sha256": "3c94cc11eed0774b8c1a1041d51f4527099902d1fa4da25332068d3c37e40a83"
+  },
+  {
+    "path": "vendor/design/LICENSE.xmldom-MIT.txt",
+    "bytes": 1298,
+    "sha256": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71"
+  },
+  {
+    "path": "vendor/design/LICENSE.saxes-ISC.txt",
+    "bytes": 3011,
+    "sha256": "0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e"
+  },
+  {
+    "path": "vendor/design/LICENSE.xmlchars-MIT.txt",
+    "bytes": 1086,
+    "sha256": "45d196313c2647d313cc65ca9b093d2d6974b64d35ee7346f2c60c9d518dff2c"
+  },
+  {
+    "path": "vendor/design/adobe-container.worker.js",
+    "bytes": 195086,
+    "sha256": "b2c1867d5854e649274789b93365e875cdd84af6ad8dd8ddd221c37d547477fd"
+  },
+  {
+    "path": "vendor/design/postscript.worker.js",
+    "bytes": 10685,
+    "sha256": "51be6c3ddfb88d77cca31ab1e3b5250737fe6f8b3ddd125d4531645cd4ad0470"
+  },
+  {
+    "path": "vendor/design/stet_wasm_bg.wasm",
+    "bytes": 14706940,
+    "sha256": "b8d72531ec41ca497d67a79589a1dbb44748a4fefd088aa122007fbb28e06b20"
+  },
+  {
+    "path": "vendor/design/LICENSE.stet-Apache-2.0.txt",
+    "bytes": 10283,
+    "sha256": "281755c6f4d045a464a29eb720c3e7586175c621352675dce144ca74bd1228cb"
+  },
+  {
+    "path": "vendor/design/LICENSE.stet-MIT.txt",
+    "bytes": 1069,
+    "sha256": "4e27c8bbd00f817fb6fb96e8ca8eada8f0983a50a38fe3114ba8f977d31f654b"
+  },
+  {
+    "path": "vendor/design/LICENSE.Stet-URW-Fonts-OFL-1.1.txt",
+    "bytes": 6631,
+    "sha256": "64e0f8458b90c8305d0b89d5f0c3401e861bdda648cdcb5ae1a4d1f132171e66"
+  },
+  {
+    "path": "vendor/design/LICENSE.Stet-CMYK-Profile.txt",
+    "bytes": 1207,
+    "sha256": "80d58f24890cc7abacc62651c199b79b7fa9fcc10aa781756d029312298d672f"
+  },
+  {
+    "path": "vendor/design/LICENSE.CC0-1.0.txt",
+    "bytes": 6552,
+    "sha256": "469d87b5fa48f8aaf69e25f4fcac3a309c97dbb7d561b917638abdb640e004d9"
+  },
+  {
+    "path": "vendor/design/Stet_NATIVE_THIRD_PARTY_LICENSES.json",
+    "bytes": 374678,
+    "sha256": "cbca7bd3c1c1d4e7cbae0fe0330a5d1589db7d219b0b858df6f5bc266ebb9dc8"
+  },
+  {
+    "path": "vendor/design/LICENSE.Carlito-OFL-1.1.txt",
+    "bytes": 4424,
+    "sha256": "58402f82a7c332a700294988fe7554fbb0a63a8d27ccc1ee3bbc640311990a00"
+  },
+  {
+    "path": "vendor/design/LICENSE.Tinos-OFL-1.1.txt",
+    "bytes": 4383,
+    "sha256": "cb3382d4643e8b02c12e322c220a3c76a5020d667e4fd4e7c75e744cca6caa6b"
+  },
+  {
+    "path": "vendor/design/LICENSE.Cousine-OFL-1.1.txt",
+    "bytes": 4387,
+    "sha256": "b81c4d4dc0a9f72c9155e78187316e016e2012a8102468804173dc61468b906d"
+  },
+  {
+    "path": "vendor/design/LICENSE.NotoSansSymbols2-OFL-1.1.txt",
+    "bytes": 4383,
+    "sha256": "b118dd41337806a5d4797052c77caf3bd096aed783e5eb21b4d11154351e1ac0"
+  },
+  {
+    "path": "vendor/design/Introspect_NATIVE_THIRD_PARTY_LICENSES.json",
+    "bytes": 1273530,
+    "sha256": "e925984774a09b922d9f405951cd5b2bfba3704fe2903bac0a5040724e3015bc"
+  },
+  {
+    "path": "vendor/design/idml.worker.js",
+    "bytes": 59303,
+    "sha256": "baec00d08e2e42a54e96609e088685eaf19d1b4367c6063077461fe3257c6fbc"
+  },
+  {
+    "path": "vendor/design/paged_introspect_wasm_bg.wasm",
+    "bytes": 14704821,
+    "sha256": "c80bec2b3192225e45cfdac86e8b04dde73beb94f1655ec256423ae1746a2d83"
+  },
+  {
+    "path": "vendor/design/LICENSE.introspect-wasm-MPL-2.0.txt",
+    "bytes": 16726,
+    "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+  }
+]

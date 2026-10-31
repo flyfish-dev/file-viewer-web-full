@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { readdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { extname, join } from 'node:path'
 
@@ -241,7 +242,56 @@ async function collectTextFiles(root, files = []) {
   return files
 }
 
+export function isRetainedNativeNoticeBook(original, file) {
+  if (extname(file).toLowerCase() !== '.json') return false
+  try {
+    const book = JSON.parse(original)
+    if (book?.schemaVersion !== 1 || typeof book.releaseApproval !== 'boolean' ||
+      !Array.isArray(book.packages) || !book.packages.length ||
+      !Array.isArray(book.runtimeFiles) || !book.runtimeFiles.length ||
+      !Array.isArray(book.standardLibrary?.legalFiles) ||
+      !book.materials || Array.isArray(book.materials)) return false
+    const materials = Object.entries(book.materials)
+    if (!materials.length || !materials.every(([hash, material]) => {
+      if (!/^[a-f0-9]{64}$/.test(hash) || material?.sha256 !== hash || typeof material.text !== 'string') return false
+      const bytes = Buffer.from(material.text, 'utf8')
+      return material.bytes === bytes.length && createHash('sha256').update(bytes).digest('hex') === hash
+    })) return false
+    return [...book.packages, book.standardLibrary].every(entry =>
+      Array.isArray(entry.legalFiles) && entry.legalFiles.length > 0 &&
+      entry.legalFiles.every(ref => Object.hasOwn(book.materials, ref.sha256)))
+  } catch {
+    return false
+  }
+}
+
+export function isRetainedPackageManifest(original, file) {
+  if (file.split(/[\\/]/).at(-1) !== 'package.json') return false
+  try {
+    const manifest = JSON.parse(original)
+    if (typeof manifest?.name !== 'string' || !/^(@[a-z0-9._-]+\/)?[a-z0-9._-]+$/i.test(manifest.name) ||
+      typeof manifest.version !== 'string' || !/^\d+\.\d+\.\d+(?:[-+][0-9a-z.+-]+)?$/i.test(manifest.version)) return false
+    const runtimeFields = { ...manifest }
+    // These npm fields describe publication, attribution and user navigation.
+    // They never supply runtime fetch defaults. Preserve their original bytes.
+    for (const key of ['homepage', 'repository', 'bugs', 'funding', 'author', 'contributors',
+      'maintainers', 'description', 'keywords', 'license', 'licenses', 'readme', 'unpkg', 'jsdelivr']) {
+      delete runtimeFields[key]
+    }
+    const runtime = JSON.stringify(runtimeFields)
+    return !replacements.some(item => new RegExp(item.pattern.source, item.pattern.flags).test(runtime))
+  } catch {
+    return false
+  }
+}
+
 export function sanitizeOfflineAssetText(original, file, options = {}) {
+  // Complete native grants and immutable source offers are inert legal data.
+  // Keep their original bytes; runtime JS and ordinary asset JSON still pass
+  // through every offline fallback rule below.
+  if (isRetainedNativeNoticeBook(original, file) || isRetainedPackageManifest(original, file)) {
+    return { output: original, replacementCount: 0 }
+  }
   let text = original
   let replacementCount = 0
   for (const item of replacements) {
